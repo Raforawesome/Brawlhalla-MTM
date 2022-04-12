@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 // Only works for 1 dimensional JSON arrays with string values
 pub fn json_parse(json: String) -> HashMap<String, String> {
     let mut map: HashMap<String, String> = HashMap::new();

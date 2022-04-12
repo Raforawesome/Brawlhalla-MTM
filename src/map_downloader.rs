@@ -1,9 +1,10 @@
 use std::path::PathBuf;
 use std::collections::HashMap;
 use std::env;
+use crate::fmt;
 
-pub async fn maps_dir() -> PathBuf {
-    let mut base_path;
+pub fn maps_dir() -> PathBuf {
+    let mut base_path = PathBuf::new();
     if let Ok(path) = env::current_exe() {
         base_path = path;
     } else {
@@ -15,7 +16,7 @@ pub async fn maps_dir() -> PathBuf {
     std::mem::drop(base_path);
     let exists = map_path.exists();
 
-    if exists == false {
+    if !exists {
         dbg!(&map_path);
         let res = std::fs::create_dir(&map_path);
         if res.is_err() {
@@ -24,19 +25,30 @@ pub async fn maps_dir() -> PathBuf {
             std::process::exit(1);
         }
     }
-    let _e = get_manifest().await;
     map_path
 }
 
-async fn get_manifest() -> HashMap<String, String> {
-    let map: HashMap<String, String> = HashMap::new();
-    let retrieved = request().await;
-    json_parse(retrieved);
+pub fn download_file(link: &str, outfile: &str) {
+    let mut outfile = std::fs::File::create(outfile).unwrap_or_else(|_| {
+        eprintln!("Error occurred in creating download file");
+        std::process::exit(1);
+    });
+    let response = request(link);
+    std::io::copy(&mut response.as_bytes(), &mut outfile).unwrap_or_else(|_| {
+        eprintln!("Error copying file");
+        std::process::exit(1);
+    });
+}
+
+pub fn get_manifest() -> HashMap<String, String> {
+    let retrieved = request("https://raforaweso.me/brawlhalla-maps/manifest.json");
+    let map: HashMap<String, String> = fmt::json_parse(retrieved);
     map
 }
 
-async fn request() -> String {
-    let b1 = reqwest::get("https://raforaweso.me/brawlhalla-maps/manifest.json");
+#[tokio::main]
+async fn request(link: &str) -> String {
+    let b1 = reqwest::get(link);
     let b2 = b1.await.unwrap();
     let body = b2.text().await.unwrap();
     body
