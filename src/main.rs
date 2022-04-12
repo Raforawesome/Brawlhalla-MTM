@@ -1,5 +1,9 @@
+use std::path::PathBuf;
 mod map_downloader;
+mod fmt;
 
 fn main() {
-    println!("Hello, world!");
+    let js: String = String::from("{\n  \"e\": \"e\"\n}");
+    let parsed = fmt::json_parse(js);
+    println!("{:?}", parsed);
 }

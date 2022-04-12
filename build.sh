@@ -8,7 +8,6 @@ export CC_aarch64_unknown_linux_gnu=aarch64-unknown-linux-gnu-gcc
 export CXX_aarch64_unknown_linux_gnu=aarch64-unknown-linux-gnu-g++
 export AR_aarch64_unknown_linux_gnu=aarch64-unknown-linux-gnu-ar
 export CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER=aarch64-unknown-linux-gnu-gcc
-export CARGO_TARGET_DIR=bin
 # shellcheck disable=SC1073
 for target in "${targets[@]}"
 do
