@@ -5,7 +5,7 @@ mod map_downloader;
 mod fmt;
 
 fn main() {
-    // let platform: &str = std::env::consts::OS;  // not needed anymore
+    let platform: &str = std::env::consts::OS;
     let map_dir: PathBuf = map_downloader::maps_dir();
     let manifest: HashMap<String, String> = map_downloader::get_manifest();
     println!("{:?}", manifest);
@@ -32,6 +32,23 @@ fn main() {
             }
         }
         std::mem::drop(input);
+    }
+
+    // Get game path
+    let mut game_path: PathBuf = PathBuf::new();
+    let homedir: PathBuf = std::env::current_dir().unwrap_or_else(|_| {
+        println!("Failed to get home directory!");
+        PathBuf::new()
+    });
+    if platform == "windows" {
+        game_path = PathBuf::from("");
+    } else if platform == "macos" {
+        game_path = homedir.clone().join("Library/Application Support/Steam/steamapps/common/Brawlhalla/Brawlhalla.app/Contents/Resources");
+    } else if platform == "linux" {
+        game_path = PathBuf::from("/usr/bin/Brawlhalla");
+    } else {
+        println!("Unsupported platform!");
+        std::process::exit(1);
     }
 
 

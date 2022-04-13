@@ -28,14 +28,25 @@ pub fn maps_dir() -> PathBuf {
     map_path
 }
 
+// pub fn download_file(link: &str, outfile: &str) {
+//     let mut outfile = std::fs::File::create(outfile).unwrap_or_else(|_| {
+//         eprintln!("Error occurred in creating download file");
+//         std::process::exit(1);
+//     });
+//     let response = request(link);
+//     std::io::copy(&mut response.as_bytes(), &mut outfile).unwrap_or_else(|_| {
+//         eprintln!("Error copying file");
+//         std::process::exit(1);
+//     });
+// }
+
 pub fn download_file(link: &str, outfile: &str) {
     let mut outfile = std::fs::File::create(outfile).unwrap_or_else(|_| {
         eprintln!("Error occurred in creating download file");
         std::process::exit(1);
     });
-    let response = request(link);
-    std::io::copy(&mut response.as_bytes(), &mut outfile).unwrap_or_else(|_| {
-        eprintln!("Error copying file");
+    reqwest::blocking::get(link).unwrap().copy_to(&mut outfile).unwrap_or_else(|_| {
+        println!("Failed to copy downloaded file.");
         std::process::exit(1);
     });
 }
