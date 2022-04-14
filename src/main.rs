@@ -1,4 +1,4 @@
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 use std::collections::HashMap;
 mod map_downloader;
 mod fmt;
@@ -34,25 +34,55 @@ fn main() {
         std::mem::drop(input);
     }
 
+    // Select which map to use
+    let options: Vec<&String> = manifest.keys().collect();
+
+    for (i, v) in options.iter().enumerate() {
+        println!("{}. {}", i + 1, v);
+    }
+
+    let mut selected: &str = "";
+    while selected.is_empty() {
+        let mut choice: String = String::new();
+        let _ = std::io::stdin().read_line(&mut choice);
+        let choice_num = choice.trim().parse::<i32>();
+        if let Ok(..) = choice_num {
+            let unwrapped: i32 = choice_num.unwrap();
+            if options.len() >= unwrapped as usize && unwrapped > 0 {
+                selected = options[(unwrapped - 1) as usize];
+            } else {
+                println!("Invalid choice!");
+            }
+        } else {
+            println!("Input is not a number!");
+        }
+    }
+    println!();
+    println!("Opening {}", selected);
+    let tmp: Vec<&str> = manifest.get(selected).unwrap().split(".").collect();
+    let folder_name = tmp[0];
+    std::mem::drop(tmp);
+    let chosen_dir = std::fs::read_dir(&map_dir.join(folder_name)).unwrap_or_else(|_| {
+        println!("Error in opening {}, do you have the maps downloaded?", selected);
+        std::process::exit(1);
+    });
+
     // Get game path
     let game_path: PathBuf = lib::get_game_path();
+    let image_path: PathBuf = game_path.join("images");
+    let map_art_path: PathBuf = game_path.join("mapArt");
+    for f in chosen_dir {
+        let folder = f.unwrap();
+        if folder.file_type().unwrap().is_dir() {
+            if folder.file_name() == "images" {
+                lib::copy_dir(&folder.path(), &image_path).unwrap();
+            } else if folder.file_name() == "mapArt" {
+                lib::copy_dir(&folder.path(), &map_art_path).unwrap();
+            }
+        }
+    }
 
-
-    // let input: String = String::new();
-    // while &input == "" {
-    //     let mut temp: String = String::new();
-    //     let _ = std::io::stdin().read_line(&mut temp);
-    //     match temp.as_str() {
-    //         "1" => {},
-    //         "2" => {},
-    //         "3" => {},
-    //         "4" => {},
-    //         _ => {
-    //             println!("Invalid input, please try again.\n");
-    //         }
-    //     }
-    // }
-    // std::mem::drop(input);
+    println!("Successfully changed map theme to {}.", selected);
 }
 
 fn download_maps(manifest: &HashMap<String, String>, map_dir: &PathBuf) {
