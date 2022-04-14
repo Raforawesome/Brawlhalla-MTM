@@ -2,6 +2,7 @@ use std::path::PathBuf;
 use std::collections::HashMap;
 use std::env;
 use crate::fmt;
+use std::io::Cursor;
 
 pub fn maps_dir() -> PathBuf {
     let mut base_path = PathBuf::new();
@@ -40,7 +41,8 @@ pub fn maps_dir() -> PathBuf {
 //     });
 // }
 
-pub fn download_file(link: &str, outfile: &str) {
+pub fn download_file(link: &str, outfile: &str) -> Vec<u8> {
+    let outfile_string = String::from(outfile);
     let mut outfile = std::fs::File::create(outfile).unwrap_or_else(|_| {
         eprintln!("Error occurred in creating download file");
         std::process::exit(1);
@@ -49,12 +51,29 @@ pub fn download_file(link: &str, outfile: &str) {
         println!("Failed to copy downloaded file.");
         std::process::exit(1);
     });
+
+    std::fs::read(PathBuf::from(outfile_string)).unwrap_or_else(|_| {
+        println!("Error in reading downloaded file!");
+        std::process::exit(1);
+    })
 }
 
 pub fn get_manifest() -> HashMap<String, String> {
     let retrieved = request("https://raforaweso.me/brawlhalla-maps/manifest.json");
     let map: HashMap<String, String> = fmt::json_parse(retrieved);
     map
+}
+
+pub fn unzip_map(map: Vec<u8>, target: &PathBuf) -> Result<(), ()> {
+    let res = zip_extract::extract(Cursor::new(map), target, false);
+    match res {
+        Ok(_) => {
+            Ok(())
+        },
+        Err(_) => {
+            Err(())
+        }
+    }
 }
 
 #[tokio::main]
