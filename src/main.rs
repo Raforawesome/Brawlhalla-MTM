@@ -1,11 +1,11 @@
 use std::path::PathBuf;
 use std::collections::HashMap;
-use rayon::prelude::*;
 mod map_downloader;
 mod fmt;
+mod lib;
 
 fn main() {
-    let platform: &str = std::env::consts::OS;
+    let _platform: &str = std::env::consts::OS;
     let map_dir: PathBuf = map_downloader::maps_dir();
     let manifest: HashMap<String, String> = map_downloader::get_manifest();
     println!("{:?}", manifest);
@@ -35,21 +35,8 @@ fn main() {
     }
 
     // Get game path
-    let mut game_path: PathBuf = PathBuf::new();
-    let homedir: PathBuf = std::env::current_dir().unwrap_or_else(|_| {
-        println!("Failed to get home directory!");
-        PathBuf::new()
-    });
-    if platform == "windows" {
-        game_path = PathBuf::from("");
-    } else if platform == "macos" {
-        game_path = homedir.clone().join("Library/Application Support/Steam/steamapps/common/Brawlhalla/Brawlhalla.app/Contents/Resources");
-    } else if platform == "linux" {
-        game_path = PathBuf::from("/usr/bin/Brawlhalla");
-    } else {
-        println!("Unsupported platform!");
-        std::process::exit(1);
-    }
+    let game_path: PathBuf = lib::get_game_path();
+    println!("{:?}", game_path);
 
 
     // let input: String = String::new();
@@ -66,6 +53,7 @@ fn main() {
     //         }
     //     }
     // }
+    // std::mem::drop(input);
 }
 
 fn download_maps(manifest: &HashMap<String, String>, map_dir: &PathBuf) {
@@ -82,11 +70,11 @@ fn download_maps(manifest: &HashMap<String, String>, map_dir: &PathBuf) {
     }
 }
 
-fn key_from_value<T: PartialEq>(map: HashMap<T, T>, va: T) -> Option<T> {
-    for (k, v) in map {
-        if v == va {
-            return Some(k);
-        }
-    };
-    None
-}
+// fn key_from_value<T: PartialEq>(map: HashMap<T, T>, va: T) -> Option<T> {
+//     for (k, v) in map {
+//         if v == va {
+//             return Some(k);
+//         }
+//     };
+//     None
+// }
