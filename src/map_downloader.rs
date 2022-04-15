@@ -59,7 +59,7 @@ pub fn download_file(link: &str, outfile: &str) -> Vec<u8> {
 }
 
 pub fn get_manifest() -> HashMap<String, String> {
-    let retrieved = request("https://raforaweso.me/brawlhalla-maps/manifest.json");
+    let retrieved = request("https://bmaps.raforaweso.me/brawlhalla-maps/manifest.json");
     let map: HashMap<String, String> = fmt::json_parse(retrieved);
     map
 }
