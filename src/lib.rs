@@ -8,7 +8,7 @@ pub fn get_game_path() -> PathBuf {
         std::process::exit(1);
     });
     if platform == "windows" {
-        game_path = PathBuf::from("");
+        game_path = PathBuf::from("C:\\Program Files (x86)\\Steam\\steamapps\\common\\Brawlhalla");
     } else if platform == "macos" {
         game_path = homedir.join("Library/Application Support/Steam/steamapps/common/Brawlhalla/Brawlhalla.app/Contents/Resources");
     } else if platform == "linux" {
