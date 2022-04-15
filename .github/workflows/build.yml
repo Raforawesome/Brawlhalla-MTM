@@ -34,7 +34,7 @@
               target: x86_64-apple-darwin
               cross: false
             - build: windows
-              os: windows-latest  # build job for x86_64 macOS
+              os: windows-latest  # build job for x86_64 Windows
               rust: stable
               target: x86_64-pc-windows-gnu
               cross: false
@@ -55,11 +55,11 @@
               rust: stable
               target: aarch64-apple-darwin
               cross: false
-            - build: aarch64  # build job for arm64 Windows
-              os: windows-latest
-              rust: stable
-              target: aarch64-pc-windows-msvc
-              cross: false
+#            - build: aarch64  # build job for arm64 Windows
+#              os: windows-latest
+#              rust: stable
+#              target: aarch64-pc-windows-msvc
+#              cross: false
       steps:
       - name: Checkout
         uses: actions/checkout@v2
